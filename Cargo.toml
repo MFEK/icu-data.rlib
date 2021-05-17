@@ -1,0 +1,15 @@
+[package]
+name = "icu-data-rs"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+brotli = "3.3"
+log = "0.4"
+tar = "0.4"
+lazy_static = "1.4"
+pest = "2.1"
+pest_derive = "2.1"
+pest_ascii_tree = "0.1"
