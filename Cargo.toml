@@ -5,6 +5,7 @@ edition = "2018"
 keywords = ["unicode", "encodings", "mappings", "ucm"]
 license = "Apache-2.0"
 repository = "https://github.com/MFEK/icu-data.rlib"
+description = "International Components for Unicode (ICU) data in Rust structures"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
