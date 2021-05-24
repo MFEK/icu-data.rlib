@@ -1,0 +1,39 @@
+ucm = {SOI ~ record* ~ EOI}
+
+// Quoted strings
+quoted_string = _{ "\"" ~ qs_inner ~ "\"" }
+qs_inner = @{ qs_char* }
+qs_char = {
+    !("\"" | "\\") ~ ANY
+    | "\\" ~ ("\"" | "\\")
+}
+
+metadata_key = { (!">" ~ ANY)+ }
+metadata_tag = _{ "<" ~ metadata_key ~ ">" }
+bytechar = { "\\" ~ "x" ~ ASCII_HEX_DIGIT{1,2} }
+bytestring = { ("\\" ~ "x" ~ ASCII_HEX_DIGIT{1,2}){2,} }
+integer = { ASCII_DIGIT+ }
+metadata_record = { metadata_tag ~ ((bytestring | bytechar) | quoted_string | integer) }
+unicode_inner = { ASCII_HEX_DIGIT{1,6} }
+unicode_tag = _{ "<" ~ "U" ~ unicode_inner ~ ">" }
+type0 = { "|" ~ "0" }
+type1 = { "|" ~ "1" }
+type2 = { "|" ~ "2" }
+type3 = { "|" ~ "3" }
+unicode_record = { unicode_tag ~ (bytestring | bytechar) ~ (type0 | type1 | type2 | type3) }
+
+// icu:state https://unicode-org.github.io/icu/userguide/conversion/data.html#state-table-syntax-in-ucm-files
+state_entry = { state_range ~ (":" ~ state_nextstate)? ~ ("." ~ state_action?)? }
+state_number = _{ ASCII_HEX_DIGIT ~ ASCII_HEX_DIGIT? }
+state_range = _{ state_number ~ ("-" ~ state_number)? }
+state_nextstate = _{ state_number }
+state_action = _{ "u" | "s" | "p" | "i" }
+state_firstentry = _{ "initial" | "surrogates" }
+state_row = { (state_firstentry ~ ",")? ~ state_entry ~ ("," ~ state_entry)* }
+state_record = { "<icu:state>" ~ state_row? }
+
+record = _{ (state_record | unicode_record | metadata_record | ("END"? ~ "CHARMAP"))* ~ ("\n" | "\r" | "\r\n") }
+
+WHITESPACE = _{ " " | "\t" }
+comment_inner = { (!"\n" ~ ANY)* }
+COMMENT = _{ "#" ~ WHITESPACE* ~ comment_inner? }
